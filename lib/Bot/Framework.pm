@@ -136,13 +136,13 @@ sub init_db
 	@tables = $d->tables();
 	my %tablefound;
 
-	printf "db: Tables found: %d", ($#tables + 1);
+	printf "db: Tables found: %d\n", ($#tables + 1);
 
 	foreach my $tname (@tables) {
 		#printf "db: Checking dbms table '%s'\n", $tname;
 		foreach my $tn (('players')) {
 			my $tre = $tablere;
-			$tre =~ s/5name%/$tn/g;
+			$tre =~ s/%name%/$tn/g;
 			if ($tname =~ m/$tre/) {
 				printf "db: Matched '%s' to our table '%s' via tablere '%s'\n",
 					$tname, $tn, $tre;
