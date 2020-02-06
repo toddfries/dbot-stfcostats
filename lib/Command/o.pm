@@ -59,11 +59,18 @@ sub cmd_info
 
 	my $info;
 
-	my $q = "select id from players where did=".$author->{id}.";";
+	my $q = "select id from players where did='".$author->{id}."'";
 
-	$info = "Your Assignment, $replyto, is to scan sector one for ";
-	$info .= " lvl27 [ĐÇ] ÅňğëłŐfĐ3åťh (aka HollowGrahms) base.\n";
-	$info .= "Sector one: Benzi[4], Dalfa[2], Zanti[1], Tohvus[1], Bo-Jeems[1], Folin[2], Corla[1], Barra[1], Soeller[1]\n";
+	my $id = $bot->{'db'}->do_oneret_query($q);
+	if (defined($id) && $id > -1) {
+		$info = "Your id in my db is ${id}, did ".$author->{id};
+	} else {
+		$q = "INSERT INTO players ( did ) values ( '".$author->{id}."')";
+		my $oid = $bot->{'db'}->do_oid_insert($q, 'o::cmd_info');
+		$q = "SELECT id FROM players where oid = ${oid}";
+		$id = $bot->{db}->do_oneret_query($q);
+		$info = "Added your id in my db, it is ${id}, did ".$author->{id};
+	}
 	
 	# We can use some special formatting with the webhook.
 	if ( my $hook = $bot->has_webhook($channel) )

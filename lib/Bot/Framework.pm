@@ -157,7 +157,7 @@ sub init_db
 		$q .= "id ${serialtype}, ";
 		$q .= "did TEXT, ";
 		$q .= "addtime timestamp without time zone DEFAULT now()";
-		$q .= ")";
+		$q .= ") with oids";
 		my $sth = $d->doquery($q);
 	}
 }
@@ -262,7 +262,12 @@ sub discord_on_message_create
 	}
     } 
     my $channel = $self->get_channel($cid);
-    my $cname = $channel->{name};
+    my $cname;
+    if (defined($channel)) {
+    	$cname = $channel->{name};
+    } else {
+	$cname = $cid;
+    }
     my @mentions = @{$hash->{'mentions'}};
     my $trigger = $self->{'trigger'};
     my $discord_name = $self->name();
@@ -475,6 +480,9 @@ sub uid_to_member
     my ($self, $cid, $author) = @_;
     my $uid = $author->{id};
     my $guildid =  $self->{'channels'}{$cid};
+    if (!defined($guildid)) {
+	return;
+    }
     my @members = @{$self->{guilds}->{$guildid}->{members}};
     #print Dumper($uid);
     #print "looking for user id ${uid}\n";
@@ -491,6 +499,9 @@ sub get_channel
 {
     my ($self, $id) = @_;
     my $guildid =  $self->get_guild_by_channel($id);
+    if (!defined($guildid)) {
+	return undef;
+    }
     my @channels = @{$self->{guilds}->{$guildid}->{channels}};
     foreach my $chan (@channels) {
 	if ($chan->{id} == $id) {
@@ -503,6 +514,9 @@ sub cid_to_guild
 {
     my ($self, $cid) = @_;
     my $guildid =  $self->get_guild_by_channel($cid);
+    if (!defined($guildid)) {
+	return undef;
+    }
     print "cid_to_guild: cid=${cid}\n";
     my $guild = $self->{guilds}->{$guildid};
     #print Dumper($guild);
