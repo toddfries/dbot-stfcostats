@@ -8,6 +8,10 @@ use Data::Dumper;
 use Mojo::Discord;
 use Mojo::IOLoop;
 
+use FDC::db;
+use DBD::Pg; # only to use PG_BYTEA
+use POSIX qw(getpid);
+
 use Exporter qw(import);
 our @EXPORT_OK = qw(add_command command get_patterns);
 
@@ -52,6 +56,28 @@ sub new
     $self->{'webhook_avatar'} = $params{'discord'}->{'webhook_avatar'};
     $self->{'faqfile'} = $params{'discord'}->{'faqfile'};
 
+    $self->{'dbtype'} = $params{'discord'}->{'dbtype'};
+    $self->{'dbhost'} = $params{'discord'}->{'dbhost'};
+    $self->{'dbname'} = $params{'discord'}->{'dbname'};
+    $self->{'dbuser'} = $params{'discord'}->{'dbuser'};
+    $self->{'dbpass'} = $params{'discord'}->{'dbpass'};
+    if (defined($self->{'dbhost'}) && defined($self->{'dbname'})) {
+	$self->{dsn} = sprintf("%s:dbname=%s;host=%s",
+		$self->{dbtype},
+		$self->{dbname},
+		$self->{dbhost});
+    	$self->{db} = FDC::db->new(
+		$self->{dsn},
+		$self->{dbuser},
+		$self->{dbpass},
+	);
+    	if (!defined($self->{db})) {
+		return undef;
+    	}
+	$self->{stats} = { };
+	$self->{stats}->{pgct} = 0;
+    }
+
     return $self;
 }
 
@@ -60,11 +86,82 @@ sub start
 {
     my $self = shift;
 
+    $self->init_db();
     $self->{'discord'}->init();
     
     # Start the IOLoop unless it is already running. 
     Mojo::IOLoop->start unless Mojo::IOLoop->is_running; 
 }
+
+sub init_db
+{
+	my ($self) = @_;
+
+	if (!defined($self->{'db'})) {
+		# we failed to init in new() so fail gracefully here
+		return;
+	}
+
+	my @tables;
+
+	my $d = $self->{'db'};
+
+	my $dbmsname = $d->getdbh()->get_info( 17 );
+	my $dbmsver  = $d->getdbh()->get_info( 18 );
+
+	my ($serialtype,$blobtype,$tablere,$index_create_re);
+
+	if ($dbmsname eq "PostgreSQL") {
+		$serialtype = "serial";
+		$blobtype = "bytea";
+		$tablere = '\\.%name%$';
+		$self->{stats}->{pgsz} = 1;
+		my $get_dbsz  = "SELECT  pg_database_size(datname) db_size ";
+		$get_dbsz .= "FROM pg_database where datname = '";
+		$get_dbsz .= $self->{dbname};
+		$get_dbsz .= "' ORDER BY db_size";
+		$self->{get_dbsz} = $get_dbsz;
+		my $blob_bind_type = { pg_type => PG_BYTEA };
+		$self->{blob_bind_type} = $blob_bind_type;
+		$index_create_re  = "CREATE INDEX %NAME% ON %TABLE% using ";
+		$index_create_re .= "btree ( %PARAMS% )";
+		$d->do("SET application_name = 'stfcstatsbot/".getpid()."'");
+	} else {
+		print "db: Unknown dbmsname and version ${dbmsname} ${dbmsver}\n";
+		return;
+	}
+
+	$self->{stats}->{pgct} = $d->do_oneret_query($self->{get_dbsz});
+
+	@tables = $d->tables();
+	my %tablefound;
+
+	printf "db: Tables found: %d", ($#tables + 1);
+
+	foreach my $tname (@tables) {
+		#printf "db: Checking dbms table '%s'\n", $tname;
+		foreach my $tn (('players')) {
+			my $tre = $tablere;
+			$tre =~ s/5name%/$tn/g;
+			if ($tname =~ m/$tre/) {
+				printf "db: Matched '%s' to our table '%s' via tablere '%s'\n",
+					$tname, $tn, $tre;
+				$tablefound{$tn} = 1;
+			}
+		}
+	}
+
+	if (!defined($tablefound{'players'})) {
+		print "db: Creating players table\n";
+		my $q = "CREATE TABLE players (";
+		$q .= "id ${serialtype}, ";
+		$q .= "did TEXT, ";
+		$q .= "addtime timestamp without time zone DEFAULT now()";
+		$q .= ")";
+		my $sth = $d->doquery($q);
+	}
+}
+
 
 
 sub discord_on_ready

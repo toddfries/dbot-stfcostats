@@ -36,13 +36,13 @@ sub new
 
 	# Register our command with the bot
 	$self->{'bot'}->add_command(
-		'command'	   => $command,
-		'access'		=> $access,
-		'description'   => $description,
-		'usage'		 => $usage,
-		'pattern'	   => $pattern,
-		'function'	  => $function,
-		'object'		=> $self,
+		'command'	=> $command,
+		'access'	=> $access,
+		'description'	=> $description,
+		'usage'		=> $usage,
+		'pattern'	=> $pattern,
+		'function'	=> $function,
+		'object'	=> $self,
 	);
 	
 	return $self;
@@ -59,6 +59,7 @@ sub cmd_info
 
 	my $info;
 
+	my $q = "select id from players where did=".$author->{id}.";";
 
 	$info = "Your Assignment, $replyto, is to scan sector one for ";
 	$info .= " lvl27 [ĐÇ] ÅňğëłŐfĐ3åťh (aka HollowGrahms) base.\n";
