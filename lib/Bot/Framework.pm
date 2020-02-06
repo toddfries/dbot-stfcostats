@@ -140,7 +140,7 @@ sub init_db
 
 	foreach my $tname (@tables) {
 		#printf "db: Checking dbms table '%s'\n", $tname;
-		foreach my $tn (('players')) {
+		foreach my $tn (('players','officers','ostats')) {
 			my $tre = $tablere;
 			$tre =~ s/%name%/$tn/g;
 			if ($tname =~ m/$tre/) {
@@ -156,6 +156,33 @@ sub init_db
 		my $q = "CREATE TABLE players (";
 		$q .= "id ${serialtype}, ";
 		$q .= "did TEXT, ";
+		$q .= "addtime timestamp without time zone DEFAULT now()";
+		$q .= ") with oids";
+		my $sth = $d->doquery($q);
+	}
+	if (!defined($tablefound{'officers'})) {
+		print "db: Creating officers table\n";
+		my $q = "CREATE TABLE officers (";
+		$q .= "id ${serialtype}, ";
+		$q .= "short TEXT, ";
+		$q .= "long TEXT, ";
+		$q .= "cap_maneauver TEXT, ";
+		$q .= "off_ability TEXT, ";
+		$q .= "addtime timestamp without time zone DEFAULT now()";
+		$q .= ") with oids";
+		my $sth = $d->doquery($q);
+	}
+	if (!defined($tablefound{'ostats'})) {
+		print "db: Creating ostats table\n";
+		my $q = "CREATE TABLE ostats (";
+		$q .= "id ${serialtype}, ";
+		$q .= "player_id INTEGER, ";
+		$q .= "officer_id INTEGER, ";
+		$q .= "rank INTEGER, ";
+		$q .= "level INTEGER, ";
+		$q .= "attack INTEGER, ";
+		$q .= "defense INTEGER, ";
+		$q .= "health INTEGER, ";
 		$q .= "addtime timestamp without time zone DEFAULT now()";
 		$q .= ") with oids";
 		my $sth = $d->doquery($q);
