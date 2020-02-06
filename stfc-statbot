@@ -19,13 +19,13 @@ use warnings;
 
 use Bot::Framework;
 use Command::FAQ;
-use Command::HitMe;
+use Command::o;
 use Command::Usage;
 use Data::Dumper;
 use Getopt::Std;
 use ReadConf;
 
-our $opt_c = $ENV{'HOME'}."/.discord.conf";
+our $opt_c = $ENV{'HOME'}."/.stfc-ostats.conf";
 
 getopt('c:');
 
@@ -35,7 +35,7 @@ my $config = $r->readconf($opt_c);
 my $bot = Bot::Framework->new(%{$config});
 
 Command::FAQ->new('bot' => $bot);
-Command::HitMe->new('bot' => $bot);
+Command::o->new('bot' => $bot);
 Command::Usage->new('bot' => $bot);
 
 print "Starting Bot\n";
