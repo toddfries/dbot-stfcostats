@@ -7,14 +7,14 @@ Save your officer stats and get back some useful bits in the process.
  4 = Commander IV
  5 = Commander V
 
-Command: o (input officer status)
+Command: i (input officer status)
 
- o <shortname> <grade> <level> <attack> <defense> <health>
+ i <shortname> <grade> <level> <attack> <defense> <health>
 
 Example:
 
- o t'laan 5 30 97 210 81 
- o helvia 5 30 32 194 161
+ i t'laan 5 30 97 210 81 
+ i helvia 5 30 32 194 161
 
 Command: q (query officer stats)
 
