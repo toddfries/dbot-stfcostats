@@ -16,10 +16,10 @@ use Data::Dumper;
 my $command = "FAQ";
 my $access = 0; # Public
 my $description = "Display information about the bot, including framework, creator, and source code";
-my $pattern = '^(faq)$';
+my $pattern = '^stats faq';
 my $function = \&cmd_faq;
 my $usage = <<EOF;
-faq
+stats faq
 EOF
 ###########################################################################################
 
