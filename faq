@@ -1,6 +1,6 @@
 Save your officer stats and get back some useful bits in the process.
 
- Grade
+ Grade Key
  1 = Ensign I
  2 = Lieut. JG II
  3 = Lieut. III
@@ -24,3 +24,8 @@ Command: q (query officer stats)
  q top 5 health
  q top 5 defense
  q top 5 health+defense
+
+ q <shortname>
+
+Note: Your unique discord id will be used to distinguish your data from
+someone else's.
