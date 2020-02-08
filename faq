@@ -27,5 +27,6 @@ Command: q (query officer stats)
 
  q <shortname>
 
-Note: Your unique discord id will be used to distinguish your data from
-someone else's.
+Note:
+- Your unique discord id will be used to distinguish your data from someone else's.
+- feel free to PM this bot, your stats need not be visible to all
