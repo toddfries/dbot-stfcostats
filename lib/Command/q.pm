@@ -19,7 +19,12 @@ my $description = "Display information about the bot, including framework, creat
 my $pattern = '^q\s(.*)$';
 my $function = \&cmd_info;
 my $usage = <<EOF;
-Usage: `q <command> <count> <algo>`
+Usage:
+ `q <command> <count> <algo>`
+   .. command = top
+   .. algo = attack, health, defense, combo
+   -or-
+ `q <shortname>`
 EOF
 ###########################################################################################
 
@@ -79,6 +84,9 @@ sub cmd_info
 		if ($#bits == 3) {
 			$info .= sprintf("\nQuery parsed as: cmd='%s', count=%d, op=%s\n", $bits[1], $bits[2], $bits[3]);
 			$info .= $self->query($id, @bits);
+		} elsif ($#bits == 1) {
+			$info .= sprintf("\nQuery parsed as: officer='%s'\n", $bits[1]);
+			$info .= $self->show_stats($id, @bits);
 		} else {
 			$info .= $usage;
 		}
@@ -159,11 +167,34 @@ sub query {
 		$order .= "s.attack ";
 	}
 	
+	my $qlim = " where s.player_id = $player_id and s.officer_id = o.id ";
+	$qlim .= " $order $sort ";
+	$qlim .= " limit ${count}";
+
+	$self->_stats_fmt($qlim);
+}
+
+sub show_stats {
+	my ($self, $player_id, $tmp, $short) = @_;
+	my $bot = $self->{bot};
+	my $db  = $bot->{db};
+
+	my $qlim = " where s.player_id = $player_id and s.officer_id = o.id ";
+	$qlim .= " and o.short = ".$db->quote($short);
+
+	$self->_stats_fmt($qlim);
+}
+
+sub _stats_fmt {
+	my ($self, $qlim) = @_;
+	my $bot = $self->{bot};
+	my $db  = $bot->{db};
+
 	my $q = "select o.short, s.rank, s.level, s.attack, s.defense, s.health ";
 	$q .= "from officers as o, ostats as s ";
-	$q .= " where s.player_id = $player_id and s.officer_id = o.id ";
-	$q .= " $order $sort ";
-	$q .= " limit ${count}";
+
+	$q .= $qlim;
+
 
 	print "q: ${q}\n";
 
@@ -179,6 +210,7 @@ sub query {
 	my $str = sprintf "`    %15s%3s%3s%4s%4s%4s`\n",
 		"Short","R","L","Att","Def","Hea";
 			
+	my ($attack, $defense, $health);
 	while (($short, $rank, $level, $attack, $defense, $health) = $sth->fetchrow_array) {
 		$i++;
 		$str .= sprintf "`%2d. %15s %2d %2d %3d %3d %3d`\n", 

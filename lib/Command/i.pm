@@ -113,8 +113,13 @@ sub update_stats {
 		$officer_id = $bot->{db}->do_oneret_query($q);
 	}
 
-	$q = "select id from ostats where player_id = ${player_id} and officer_id = ${officer_id}";
-	my $stat_id = $bot->{db}->do_oneret_query($q);
+	$q = "select id,rank,level,attack,defense,health from ostats where player_id = ${player_id} and officer_id = ${officer_id}";
+	my $sth = $bot->{db}->doquery($q);
+	my $rv = $sth->rows;
+	my $stat_id;
+	if ($rv < 1) {
+		$stat_id = -1;
+	}
 	my $qret;
 	if (defined($stat_id) && $stat_id == -1) {
 		$q = "INSERT INTO ostats (player_id, officer_id, rank, level, attack, defense, health) ";
@@ -122,14 +127,32 @@ sub update_stats {
 		$q .= sprintf("(%d, %d, %d, %d, %d, %d, %d)", $player_id, $officer_id, $rank, $level, $attack,
 		    $defense, $health);
 		$qret = $bot->{db}->doquery($q);
-	} else {
-		$q  = "UPDATE ostats set ";
-		$q .= sprintf("rank=%d, level=%d, attack=%d, defense=%d, health=%d ",
-			$rank, $level, $attack, $defense, $health);
-		$q .= " where player_id = ${player_id} and officer_id = ${officer_id}";
-		$qret = $bot->{db}->doquery($q);
+		return "Saved ${shortname} bits!";
 	}
-	return "Saved ${shortname} bits!";
+	my ($orank, $olevel, $oattack, $odefense, $ohealth);
+	($stat_id, $orank, $olevel, $oattack, $odefense, $ohealth) = $sth->fetchrow_array;
+	$q  = "UPDATE ostats set ";
+	$q .= sprintf("rank=%d, level=%d, attack=%d, defense=%d, health=%d ",
+		$rank, $level, $attack, $defense, $health);
+	$q .= " where player_id = ${player_id} and officer_id = ${officer_id}";
+	$qret = $bot->{db}->doquery($q);
+	my $rstr = "Updated ${shortname} bits!\n";
+	if ($orank != $rank) {
+		$rstr .= "Rank ${orank} -> ${rank}\n";
+	}
+	if ($olevel != $level) {
+		$rstr .= "Level ${olevel} -> ${level}\n";
+	}
+	if ($oattack != $attack) {
+		$rstr .= "Attack ${oattack} -> ${attack}\n";
+	}
+	if ($odefense != $defense) {
+		$rstr .= "Defense ${odefense} -> ${defense}\n";
+	}
+	if ($ohealth != $health) {
+		$rstr .= "Health ${ohealth} -> ${health}\n";
+	}
+	return $rstr;
 }
 
 1;
