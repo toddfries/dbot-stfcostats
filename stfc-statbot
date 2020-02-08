@@ -19,7 +19,8 @@ use warnings;
 
 use Bot::Framework;
 use Command::FAQ;
-use Command::o;
+use Command::i;
+use Command::q;
 use Command::Usage;
 use Data::Dumper;
 use Getopt::Std;
@@ -35,7 +36,8 @@ my $config = $r->readconf($opt_c);
 my $bot = Bot::Framework->new(%{$config});
 
 Command::FAQ->new('bot' => $bot);
-Command::o->new('bot' => $bot);
+Command::i->new('bot' => $bot);
+Command::q->new('bot' => $bot);
 Command::Usage->new('bot' => $bot);
 
 print "Starting Bot\n";
