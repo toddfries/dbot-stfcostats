@@ -22,7 +22,7 @@ use Data::Dumper;
 use Getopt::Std;
 use ReadConf;
 
-our $opt_c = $ENV{'HOME'}."/.stfc-ostats.conf";
+our $opt_c = $ENV{'HOME'}."/.dbot-stfcostats.conf";
 
 getopt('c:');
 
