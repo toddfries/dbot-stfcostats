@@ -13,10 +13,10 @@ use Data::Dumper;
 
 ###########################################################################################
 # Command FAQ
-my $command = "FAQ";
+my $command = "stats faq";
 my $access = 0; # Public
 my $description = "Display information about the bot, including framework, creator, and source code";
-my $pattern = '^stats faq';
+my $pattern = '^stats faq$';
 my $function = \&cmd_faq;
 my $usage = <<EOF;
 stats faq

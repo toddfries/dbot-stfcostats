@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use Exporter qw(import);
-our @EXPORT_OK = qw(cmd_info);
+our @EXPORT_OK = qw(cmd_q);
 
 use Mojo::Discord;
 use Bot::Framework;
@@ -16,8 +16,8 @@ use Data::Dumper;
 my $command = "q";
 my $access = 0; # Public
 my $description = "Display information about the bot, including framework, creator, and source code";
-my $pattern = '^q\s(.*)$';
-my $function = \&cmd_info;
+my $pattern = '^q\s([a-z]+\s[0-9]+\s[a-z]+[a-z\+]+|[a-z][a-z\+0-9]+)$';
+my $function = \&cmd_q;
 my $usage = <<EOF;
 Usage:
  `q <command> <count> <algo>`
@@ -53,7 +53,7 @@ sub new
 	return $self;
 }
 
-sub cmd_info
+sub cmd_q
 {
 	my ($self, $channel, $author, $msg) = @_;
 
@@ -71,7 +71,7 @@ sub cmd_info
 		#$info = "Your id in my db is ${id}, did ".$author->{id};
 	} else {
 		$q = "INSERT INTO players ( did ) values ( '".$author->{id}."')";
-		my $oid = $bot->{'db'}->do_oid_insert($q, 'o::cmd_info');
+		my $oid = $bot->{'db'}->do_oid_insert($q, 'o::cmd_q');
 		$q = "SELECT id FROM players where oid = ${oid}";
 		$id = $bot->{db}->do_oneret_query($q);
 		#$info = "Added your id in my db, it is ${id}, did ".$author->{id};

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use Exporter qw(import);
-our @EXPORT_OK = qw(cmd_info);
+our @EXPORT_OK = qw(cmd_i);
 
 use Mojo::Discord;
 use Bot::Framework;
@@ -16,10 +16,10 @@ use Data::Dumper;
 my $command = "i";
 my $access = 0; # Public
 my $description = "Display information about the bot, including framework, creator, and source code";
-my $pattern = '^i\s';
-my $function = \&cmd_info;
+my $pattern = '^i\s[a-z][a-z0-9_\']+\s[0-9]+\s[0-9]+\s[0-9]+\s[0-9]+\s[0-9]+';
+my $function = \&cmd_i;
 my $usage = <<EOF;
-Usage: `o <shortname> <rank> <level> <attack> <defense> <health>`
+Usage: `i <shortname> <rank> <level> <attack> <defense> <health>`
 EOF
 ###########################################################################################
 
@@ -48,7 +48,7 @@ sub new
 	return $self;
 }
 
-sub cmd_info
+sub cmd_i
 {
 	my ($self, $channel, $author, $msg) = @_;
 
@@ -66,7 +66,7 @@ sub cmd_info
 		#$info = "Your id in my db is ${id}, did ".$author->{id};
 	} else {
 		$q = "INSERT INTO players ( did ) values ( '".$author->{id}."')";
-		my $oid = $bot->{'db'}->do_oid_insert($q, 'i::cmd_info');
+		my $oid = $bot->{'db'}->do_oid_insert($q, 'i::cmd_i');
 		$q = "SELECT id FROM players where oid = ${oid}";
 		$id = $bot->{db}->do_oneret_query($q);
 		#$info = "Added your id in my db, it is ${id}, did ".$author->{id};

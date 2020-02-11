@@ -19,6 +19,7 @@ use warnings;
 
 use Bot::Framework;
 use Command::FAQ;
+use Command::debug;
 use Command::i;
 use Command::q;
 use Command::Usage;
@@ -36,6 +37,7 @@ my $config = $r->readconf($opt_c);
 my $bot = Bot::Framework->new(%{$config});
 
 Command::FAQ->new('bot' => $bot);
+Command::debug->new('bot' => $bot);
 Command::i->new('bot' => $bot);
 Command::q->new('bot' => $bot);
 Command::Usage->new('bot' => $bot);

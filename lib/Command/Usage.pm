@@ -19,7 +19,10 @@ my $description = "Display information about the bot, including framework, creat
 my $pattern = '^(show help|usage)$';
 my $function = \&cmd_usage;
 my $usage = <<EOF;
-Usage: `hit me
+Usage: `stats faq
+i <shortname> <rank> <level> <attack> <defense> <health>
+q <shortname>
+q <cmd> <count> <args>
 EOF
 ###########################################################################################
 
