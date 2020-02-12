@@ -210,7 +210,7 @@ sub _stats_fmt {
 	my ($short, $rank, $level);
 	my $i = 0;
 	my $str = sprintf "`    %15s%3s%3s%4s%4s%4s%6s`\n",
-		"Short","R","L","Att","Def","Hea", "Power";
+		"Short","R","L","Att","Def","Hea", "Strength";
 			
 	my ($attack, $defense, $health);
 	while (($short, $rank, $level, $attack, $defense, $health) = $sth->fetchrow_array) {
