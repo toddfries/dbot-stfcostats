@@ -7,9 +7,10 @@ use warnings;
 use Exporter qw(import);
 our @EXPORT_OK = qw(cmd_faq);
 
-use Mojo::Discord;
 use Bot::Framework;
 use Data::Dumper;
+use Discord::Send;
+use Mojo::Discord;
 
 ###########################################################################################
 # Command FAQ

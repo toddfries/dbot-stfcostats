@@ -7,16 +7,17 @@ use warnings;
 use Exporter qw(import);
 our @EXPORT_OK = qw(cmd_q);
 
-use Mojo::Discord;
 use Bot::Framework;
 use Data::Dumper;
+use Discord::Send;
+use Mojo::Discord;
 
 ###########################################################################################
 # Command q
 my $command = "q";
 my $access = 0; # Public
 my $description = "Display information about the bot, including framework, creator, and source code";
-my $pattern = '^q\s([a-z]+\s[0-9]+\s[a-z]+[a-z\+]+|[a-z][a-z\+0-9]+)$';
+my $pattern = '^q\s([a-z]+\s[0-9]+\s[a-z]+[a-z\+]+|[a-z][a-z0-9\_\`]+)$';
 my $function = \&cmd_q;
 my $usage = <<EOF;
 Usage:
@@ -25,6 +26,8 @@ Usage:
    .. algo = attack, health, defense, combo
    -or-
  `q <shortname>`
+   -or-
+ `q all`
 EOF
 ###########################################################################################
 
@@ -50,6 +53,8 @@ sub new
 		'function'	=> $function,
 		'object'	=> $self,
 	);
+
+	$self->{send} = Discord::Send->new('bot' => $self->{bot});
 	
 	return $self;
 }
@@ -96,13 +101,8 @@ sub cmd_q
 	}
 	}
 	
-	# We can use some special formatting with the webhook.
-	if ( my $hook = $bot->has_webhook($channel) )
-	{
-		$discord->send_webhook($channel, $hook, $info);
-	} else {
-		$discord->send_message($channel, $info);
-	}
+
+	$self->{send}->send($channel, $info);
 }
 
 sub query {
@@ -196,8 +196,9 @@ sub _stats_fmt {
 
 	$q .= $qlim;
 
-
-	print "q: ${q}\n";
+	if ($self->{debug} > 0) {
+		print "q: ${q}\n";
+	}
 
 	my $sth = $db->doquery($q);
 	my $rv = $sth->rows;
@@ -208,14 +209,15 @@ sub _stats_fmt {
 
 	my ($short, $rank, $level);
 	my $i = 0;
-	my $str = sprintf "`    %15s%3s%3s%4s%4s%4s`\n",
-		"Short","R","L","Att","Def","Hea";
+	my $str = sprintf "`    %15s%3s%3s%4s%4s%4s%6s`\n",
+		"Short","R","L","Att","Def","Hea", "Power";
 			
 	my ($attack, $defense, $health);
 	while (($short, $rank, $level, $attack, $defense, $health) = $sth->fetchrow_array) {
 		$i++;
-		$str .= sprintf "`%2d. %15s %2d %2d %3d %3d %3d`\n", 
-			$i, $short, $rank, $level, $attack, $defense, $health;
+		my $power = ($rank+1) * ( $attack + $defense + $health);
+		$str .= sprintf "`%2d. %15s %2d %2d %3d %3d %3d %5d`\n", 
+			$i, $short, $rank, $level, $attack, $defense, $health, $power;
 	}
 	return $str;
 }
