@@ -344,7 +344,7 @@ sub discord_on_message_create
 		if ($self->{debug} > 0) {
 			printf "msg matched command '%s' { %s }->{access} = '%s'\n",
 				$command->{command}, $command, $access;
-			print Dumper($command);
+			#print Dumper($command);
 		}
 
                 if ( defined $access and $access > 0 and defined $owner and $owner != $author->{'id'} )
