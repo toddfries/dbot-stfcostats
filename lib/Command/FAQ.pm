@@ -9,6 +9,7 @@ our @EXPORT_OK = qw(cmd_faq);
 
 use Bot::Framework;
 use Data::Dumper;
+use Discord::Players;
 use Discord::Send;
 use Mojo::Discord;
 
@@ -46,6 +47,11 @@ sub new
         'function'      => $function,
         'object'        => $self,
     );
+
+    $self->{send} = Discord::Send->new('bot' => $self->{bot});
+    if (!defined($self->{bot}->{players})) {
+	$self->{bot}->{players} = Discord::Players->new('bot' => $self->{bot});
+    }
     
     return $self;
 }
@@ -61,6 +67,9 @@ sub cmd_faq
     if ($bot->{debug} > 0) {
 	print "Arrived at cmd_faq\n";
     }
+
+    my $player = $bot->{players}->get_player($author);
+    my $id = $player->get_id;
 
     my $faq = "The F.A.Q.!\n";
     if (-f $file) {

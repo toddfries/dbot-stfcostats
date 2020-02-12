@@ -9,6 +9,7 @@ our @EXPORT_OK = qw(cmd_q);
 
 use Bot::Framework;
 use Data::Dumper;
+use Discord::Players;
 use Discord::Send;
 use Mojo::Discord;
 
@@ -55,6 +56,9 @@ sub new
 	);
 
 	$self->{send} = Discord::Send->new('bot' => $self->{bot});
+	if (!defined($self->{bot}->{players})) {
+		$self->{bot}->{players} = Discord::Players->new('bot' => $self->{bot});
+	}
 	
 	return $self;
 }
@@ -70,18 +74,8 @@ sub cmd_q
 
 	my $info;
 
-	my $q = "select id from players where did='".$author->{id}."'";
-
-	my $id = $bot->{'db'}->do_oneret_query($q);
-	if (defined($id) && $id > -1) {
-		#$info = "Your id in my db is ${id}, did ".$author->{id};
-	} else {
-		$q = "INSERT INTO players ( did ) values ( '".$author->{id}."')";
-		my $oid = $bot->{'db'}->do_oid_insert($q, 'o::cmd_q');
-		$q = "SELECT id FROM players where oid = ${oid}";
-		$id = $bot->{db}->do_oneret_query($q);
-		#$info = "Added your id in my db, it is ${id}, did ".$author->{id};
-	}
+	my $player = $bot->{players}->get_player($author);
+	my $id = $player->get_id;
 
 	my @bits;
 	foreach my $m (split(/^/,$msg)) {
@@ -120,7 +114,9 @@ sub query {
 	}
 	my $order = "order by ";
 
-	print "op: $op\n";
+	if ($bot->{debug} > 0) {
+		print "op: $op\n";
+	}
 	my ($attack,$defense,$health) = (0,0,0);
 	if ($op =~ /attack/) {
 		$attack = 1;
@@ -196,7 +192,7 @@ sub _stats_fmt {
 
 	$q .= $qlim;
 
-	if ($self->{debug} > 0) {
+	if ($bot->{debug} > 0) {
 		print "q: ${q}\n";
 	}
 
@@ -209,7 +205,7 @@ sub _stats_fmt {
 
 	my ($short, $rank, $level);
 	my $i = 0;
-	my $str = sprintf "`    %15s%3s%3s%4s%4s%4s%6s`\n",
+	my $str = sprintf "`    %15s%3s%3s%4s%4s%4s %s`\n",
 		"Short","R","L","Att","Def","Hea", "Strength";
 			
 	my ($attack, $defense, $health);

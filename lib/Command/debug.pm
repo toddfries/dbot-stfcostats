@@ -8,6 +8,7 @@ use Exporter qw(import);
 our @EXPORT_OK = qw(cmd_debug);
 
 use Bot::Framework;
+use Discord::Players;
 use Discord::Send;
 use Data::Dumper;
 use Mojo::Discord;
@@ -47,7 +48,12 @@ sub new
 		'function'	=> $function,
 		'object'	=> $self,
 	);
-	
+
+	$self->{send} = Discord::Send->new('bot' => $self->{bot});
+	if (!defined($self->{bot}->{players})) {
+		$self->{bot}->{players} = Discord::Players->new('bot' => $self->{bot});
+	}
+
 	return $self;
 }
 
@@ -59,6 +65,9 @@ sub cmd_debug
 	my $bot = $self->{'bot'};
 
 	my $replyto = '<@' . $author->{id} . '>';
+
+	my $player = $bot->{players}->get_player($author);
+	my $id = $player->get_id;
 
 	my $debug = "";
 	my $dask = 0;

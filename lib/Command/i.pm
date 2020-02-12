@@ -8,6 +8,7 @@ use Exporter qw(import);
 our @EXPORT_OK = qw(cmd_i);
 
 use Bot::Framework;
+use Discord::Players;
 use Discord::Send;
 use Data::Dumper;
 use Mojo::Discord;
@@ -46,6 +47,11 @@ sub new
 		'function'	=> $function,
 		'object'	=> $self,
 	);
+
+	$self->{send} = Discord::Send->new('bot' => $self->{bot});
+	if (!defined($self->{bot}->{players})) {
+		$self->{bot}->{players} = Discord::Players->new('bot' => $self->{bot});
+	}
 	
 	return $self;
 }
@@ -61,18 +67,9 @@ sub cmd_i
 
 	my $info="";
 
-	my $q = "select id from players where did='".$author->{id}."'";
+	my $player = $bot->{players}->get_player($author);
+	my $id = $player->get_id;
 
-	my $id = $bot->{'db'}->do_oneret_query($q);
-	if (defined($id) && $id > -1) {
-		#$info = "Your id in my db is ${id}, did ".$author->{id};
-	} else {
-		$q = "INSERT INTO players ( did ) values ( '".$author->{id}."')";
-		my $oid = $bot->{'db'}->do_oid_insert($q, 'i::cmd_i');
-		$q = "SELECT id FROM players where oid = ${oid}";
-		$id = $bot->{db}->do_oneret_query($q);
-		#$info = "Added your id in my db, it is ${id}, did ".$author->{id};
-	}
 
 	#print Dumper($msg);
 	foreach my $m (split(/^/,$msg)) {
