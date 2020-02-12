@@ -28,8 +28,9 @@ use Getopt::Std;
 use ReadConf;
 
 our $opt_c = $ENV{'HOME'}."/.dbot-stfcostats.conf";
+our $opt_n;
 
-getopt('c:');
+getopt('c:n');
 
 my $r = ReadConf->new();
 my $config = $r->readconf($opt_c);
@@ -41,6 +42,11 @@ Command::debug->new('bot' => $bot);
 Command::i->new('bot' => $bot);
 Command::q->new('bot' => $bot);
 Command::Usage->new('bot' => $bot);
+
+if (defined($opt_n)) {
+	print "Parsing bits tested ok, exiting\n";
+	exit(0);
+}
 
 print "Starting Bot\n";
 
