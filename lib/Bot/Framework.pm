@@ -77,6 +77,11 @@ sub new
 	$self->{stats} = { };
 	$self->{stats}->{pgct} = 0;
     }
+    $self->{debug} = $params{debug};
+
+    if (!defined($self->{debug})) {
+		$self->{debug} = 0;
+    }
 
     return $self;
 }
@@ -327,11 +332,20 @@ sub discord_on_message_create
         # If you find a match, call the command fuction.
         foreach my $pattern ($self->get_patterns())
         {
+	    if ($self->{debug} > 0) {
+		printf "msg '%s' vs re /%s/i\n", $msg, $pattern;
+	    }
             if ( $msg =~ /$pattern/i )
             {
                 my $command = $self->get_command_by_pattern($pattern);
                 my $access = $command->{'access'};
                 my $owner = $self->owner;
+
+		if ($self->{debug} > 0) {
+			printf "msg matched command '%s' { %s }->{access} = '%s'\n",
+				$command->{command}, $command, $access;
+			print Dumper($command);
+		}
 
                 if ( defined $access and $access > 0 and defined $owner and $owner != $author->{'id'} )
                 {
