@@ -33,6 +33,7 @@ sub new
 	$self->{'bot'} = $params{'bot'};
 	$self->{'discord'} = $self->{'bot'}->discord;
 	$self->{'pattern'} = $pattern;
+	$self->{'command'} = $command;
 
 	# Register our command with the bot
 	$self->{'bot'}->add_command(

@@ -34,6 +34,7 @@ sub new
 	$self->{'bot'} = $params{'bot'};
 	$self->{'discord'} = $self->{'bot'}->discord;
 	$self->{'pattern'} = $pattern;
+	$self->{'command'} = $command;
 
 	# Register our command with the bot
 	$self->{'bot'}->add_command(
@@ -58,7 +59,24 @@ sub cmd_debug
 
 	my $replyto = '<@' . $author->{id} . '>';
 
-	my $debug = '<unimplemented>\n';
+	my $debug = "";
+	my $dask = 0;
+
+	my $deb = $bot->{debug};
+	if ($msg =~ /debug on/) {
+		$dask = 1;
+	} elsif ($msg =~ /debug off/) {
+		$dask = 0;
+	} else {
+		$debug = $usage;
+	}
+
+	if ($dask == $deb) {
+		$debug .= "debug = ${deb}, no change\n";
+	} else {
+		$debug .= "debug: ${deb} -> ${dask}\n";
+		$bot->{debug} = $dask;
+	}
 	
 	# We can use some special formatting with the webhook.
 	if ( my $hook = $bot->has_webhook($channel) )

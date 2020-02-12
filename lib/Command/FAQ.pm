@@ -33,6 +33,7 @@ sub new
     $self->{'bot'} = $params{'bot'};
     $self->{'discord'} = $self->{'bot'}->discord;
     $self->{'pattern'} = $pattern;
+    $self->{'command'} = $command;
 
     # Register our command with the bot
     $self->{'bot'}->add_command(
@@ -56,14 +57,21 @@ sub cmd_faq
     my $bot = $self->{'bot'};
     my $file = $self->{'bot'}->{'faqfile'};
 
-    my $faq;
+    if ($bot->{debug} > 0) {
+	print "Arrived at cmd_faq\n";
+    }
+
+    my $faq = "The F.A.Q.!\n";
     if (-f $file) {
 	open(F,$file);
-	$faq = "";
 	while(<F>) {
 		$faq .= $_;
 	}
 	close(F);
+    }
+
+    if ($bot->{debug} > 0) {
+	printf "Sending a %d faq back\n", length($faq);
     }
     
     # We can use some special formatting with the webhook.
