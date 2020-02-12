@@ -16,7 +16,7 @@ use Data::Dumper;
 my $command = "debug";
 my $access = 0; # Public
 my $description = "Display debugrmation about the bot, including framework, creator, and source code";
-my $pattern = '^debug\s[a-z]+$';
+my $pattern = '^stats\.debug\s[a-z]+$';
 my $function = \&cmd_debug;
 my $usage = <<EOF;
 Usage:
@@ -63,18 +63,18 @@ sub cmd_debug
 	my $dask = 0;
 
 	my $deb = $bot->{debug};
-	if ($msg =~ /debug on/) {
+	if ($msg =~ /debug on$/) {
 		$dask = 1;
-	} elsif ($msg =~ /debug off/) {
+	} elsif ($msg =~ /debug off$/) {
 		$dask = 0;
 	} else {
 		$debug = $usage;
 	}
 
 	if ($dask == $deb) {
-		$debug .= "debug = ${deb}, no change\n";
+		$debug .= "stats.debug = ${deb}, no change\n";
 	} else {
-		$debug .= "debug: ${deb} -> ${dask}\n";
+		$debug .= "stats.debug: ${deb} -> ${dask}\n";
 		$bot->{debug} = $dask;
 	}
 	
