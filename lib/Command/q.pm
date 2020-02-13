@@ -84,8 +84,14 @@ sub cmd_q
 		if ($#bits == 3) {
 			$info .= sprintf("\nQuery parsed as: cmd='%s', count=%d, op=%s\n", $bits[1], $bits[2], $bits[3]);
 			$info .= $self->query($id, @bits);
+		} elsif ($#bits == 1 && $bits[1] eq "all") {
+			$info .= sprintf("\nQuery parsed as: all -> top 1000 attack\n");
+			$bits[1] = "top";
+			$bits[2] = "1000";
+			$bits[3] = "atack";
+			$info .= $self->query($id, @bits);
 		} elsif ($#bits == 1) {
-			$info .= sprintf("\nQuery parsed as: officer='%s'\n", $bits[1]);
+			$info .= sprintf("\nQuery parsed as: officer='%s'\n", lc($bits[1]));
 			$info .= $self->show_stats($id, @bits);
 		} else {
 			$info .= $usage;
@@ -177,7 +183,7 @@ sub show_stats {
 	my $db  = $bot->{db};
 
 	my $qlim = " where s.player_id = $player_id and s.officer_id = o.id ";
-	$qlim .= " and o.short = ".$db->quote($short);
+	$qlim .= " and o.short = ".$db->quote(lc($short));
 
 	$self->_stats_fmt($qlim);
 }
