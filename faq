@@ -1,22 +1,23 @@
 Save your officer stats and get back some useful bits in the process.
+That is to say, input your data, so you can query it. 
 
- Grade Key
+ **Grade Key**
  1 = Ensign I
  2 = Lieut. JG II
  3 = Lieut. III
  4 = Commander IV
  5 = Commander V
 
-Command: i (input officer status)
+**Command**: i (input officer status)
 
  i <shortname> <grade> <level> <attack> <defense> <health>
 
-Example:
+**Example**:
 
  i t'laan 5 30 97 210 81 
  i helvia 5 30 32 194 161
 
-Command: q (query officer stats)
+**Command**: q (query officer stats)
 
  q <command> <args>
 
@@ -27,6 +28,13 @@ Command: q (query officer stats)
 
  q <shortname>
 
-Note:
+**Note**
 - Your unique discord id will be used to distinguish your data from someone else's.
 - feel free to PM this bot, your stats need not be visible to all
+
+**Caveats**
+- if output exceeds discord limits, no output will be seen. fix coming.
+- cannot issue `q t'laan` as the ' char is not handled properly. fix coming.
+- officers are stored as lowercase in the database. expect lower case in bot output.
+- the bot cannot handle officer names with spaces. use underscores for now.
+- contact me <@541872005998182423> if you observe bugs or have ideas.
