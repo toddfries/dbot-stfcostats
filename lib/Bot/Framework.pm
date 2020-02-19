@@ -165,6 +165,17 @@ sub init_db
 		$q .= ") with oids";
 		my $sth = $d->doquery($q);
 	}
+	if (!defined($tablefound{'player_stats'})) {
+		print "db: Creating player_stats table\n";
+		my $q = "CREATE TABLE player_stats (";
+		$q .= "id ${serialtype}, ";
+		$q .= "academy INT, ";
+		$q .= "adv_train INT, ";
+		$q .= "attack_train INT, ";
+		$q .= "defense_train INT ";
+		$q .= ") with oids";
+		my $sth => $d->doquery($q);
+	}
 	if (!defined($tablefound{'officers'})) {
 		print "db: Creating officers table\n";
 		my $q = "CREATE TABLE officers (";
