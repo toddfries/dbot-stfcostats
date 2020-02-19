@@ -77,10 +77,12 @@ sub cmd_q
 	my $player = $bot->{players}->get_player($author);
 	my $id = $player->get_id;
 
+	$info = "From the stats database of <@".$author->{id}."> we have:\n";
+
 	my @bits;
 	foreach my $m (split(/^/,$msg)) {
 	@bits = split(/\s+/,$m);
-	if ($bits[0] eq "q") {
+	if ($bits[0] =~ /^q$/i) {
 		if ($#bits == 3) {
 			$info .= sprintf("\nQuery parsed as: cmd='%s', count=%d, op=%s\n", $bits[1], $bits[2], $bits[3]);
 			$info .= $self->query($id, @bits);
@@ -123,7 +125,7 @@ sub query {
 	if ($bot->{debug} > 0) {
 		print "op: $op\n";
 	}
-	my ($attack,$defense,$health) = (0,0,0);
+	my ($attack,$defense,$health,$strength) = (0,0,0,0);
 	if ($op =~ /attack/) {
 		$attack = 1;
 	}
@@ -133,41 +135,53 @@ sub query {
 	if ($op =~ /health/) {
 		$health = 1;
 	}
+	if ($op =~ /strength/) {
+		$strength = 1;
+	}
 
 	my $counter = 0;
-	if ($health > 0 && $defense > 0) {
-		$order .= " (s.defense + s.health) ";
-		$counter++;
-		$health = 0;
-		$defense = 0;
+	if (($health + $defense + $attack) == 2) {
+		if ($health > 0 && $defense > 0) {
+			$order .= " (s.defense + s.health) ";
+			$counter++;
+			$health = 0;
+			$defense = 0;
+		}
+		if ($health > 0 && $attack > 0) {
+			$order .= " (s.attack + s.health) ";
+			$counter++;
+			$health = 0;
+			$attack = 0;
+		}
+		if ($defense > 0 && $attack > 0) {
+			$order .= " (s.attack + s.defense) ";
+			$counter++;
+			$defense = 0;
+			$attack = 0;
+		}
+	} else {
+		if ($health > 0) {
+			$order .= "s.health ";
+			$counter++;
+		}
+		if ($defense > 0) {
+			if ($counter++ > 0) {
+				$order .= ",";
+			}
+			$order .= "s.defense ";
+		}
+		if ($attack > 0) {
+			if ($counter++ > 0) {
+				$order .= ",";
+			}
+			$order .= "s.attack ";
+		}
 	}
-	if ($health > 0 && $attack > 0) {
-		$order .= " (s.attack + s.health) ";
-		$counter++;
-		$health = 0;
-		$attack = 0;
-	}
-	if ($defense > 0 && $attack > 0) {
-		$order .= " (s.attack + s.defense) ";
-		$counter++;
-		$defense = 0;
-		$attack = 0;
-	}
-	if ($health > 0) {
-		$order .= "s.health ";
-		$counter++;
-	}
-	if ($defense > 0) {
+	if ($strength > 0) {
 		if ($counter++ > 0) {
 			$order .= ",";
 		}
-		$order .= "s.defense ";
-	}
-	if ($attack > 0) {
-		if ($counter++ > 0) {
-			$order .= ",";
-		}
-		$order .= "s.attack ";
+		$order .= "strength ";
 	}
 	
 	my $qlim = " where s.player_id = $player_id and s.officer_id = o.id ";
@@ -193,7 +207,8 @@ sub _stats_fmt {
 	my $bot = $self->{bot};
 	my $db  = $bot->{db};
 
-	my $q = "select o.short, s.rank, s.level, s.attack, s.defense, s.health ";
+	my $q = "select o.short, s.rank, s.level, s.attack, s.defense, s.health, ";
+	$q .= "((s.attack + s.defense + s.health) * (s.rank + 1)) as strength ";
 	$q .= "from officers as o, ostats as s ";
 
 	$q .= $qlim;
@@ -214,12 +229,11 @@ sub _stats_fmt {
 	my $str = sprintf "`    %15s%3s%3s%4s%4s%4s %s`\n",
 		"Short","R","L","Att","Def","Hea", "Strength";
 			
-	my ($attack, $defense, $health);
-	while (($short, $rank, $level, $attack, $defense, $health) = $sth->fetchrow_array) {
+	my ($attack, $defense, $health, $strength);
+	while (($short, $rank, $level, $attack, $defense, $health, $strength) = $sth->fetchrow_array) {
 		$i++;
-		my $power = ($rank+1) * ( $attack + $defense + $health);
 		$str .= sprintf "`%2d. %15s %2d %2d %3d %3d %3d %5d`\n", 
-			$i, $short, $rank, $level, $attack, $defense, $health, $power;
+			$i, $short, $rank, $level, $attack, $defense, $health, $strength;
 	}
 	return $str;
 }
