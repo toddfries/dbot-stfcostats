@@ -1,0 +1,15 @@
+implement paging of output if too large
+permit query of t'laan etc with ' in their name
+make 'balanced' an option for 
+figure out ship bonus for attack/defense/health to max to 300% in all if possible
+
+permit user to set levels for:
+stats.academy
+stats.adv_training
+stats.attack_training
+stats.defense_training
+
+attack on ship = attack * (academy bonus + advanced training bonus + attack training bonus)
+defense on ship = defense * (academy bonus + advanced training bonus + defense training bonus)
+health on ship = health * (academy bonus + advanced training bonus)
+strength on ship = (rank + 1) * (attack on ship + defense on ship + health on ship)
