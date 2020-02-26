@@ -71,13 +71,15 @@ sub cmd_q
 	my $bot = $self->{'bot'};
 
 	my $replyto = '<@' . $author->{id} . '>';
+	my $user = $author->{username}."#".$author->{discriminator};
+	#print Dumper($author);
 
 	my $info;
 
 	my $player = $bot->{players}->get_player($author);
 	my $id = $player->get_id;
 
-	$info = "From the stats database of <@".$author->{id}."> we have:\n";
+	$info = "From the stats database of ${user} we have:\n";
 
 	my @bits;
 	foreach my $m (split(/^/,$msg)) {
