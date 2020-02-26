@@ -145,7 +145,7 @@ sub init_db
 
 	foreach my $tname (@tables) {
 		#printf "db: Checking dbms table '%s'\n", $tname;
-		foreach my $tn (('players','officers','ostats')) {
+		foreach my $tn (('players','officers','ostats', 'player_stats')) {
 			my $tre = $tablere;
 			$tre =~ s/%name%/$tn/g;
 			if ($tname =~ m/$tre/) {
