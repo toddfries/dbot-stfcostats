@@ -31,10 +31,11 @@ That is to say, input your data, so you can query it.
 **Note**
 - Your unique discord id will be used to distinguish your data from someone else's.
 - feel free to PM this bot, your stats need not be visible to all
+- officers are stored as lowercase in the database. expect lower case in bot output.
 
 **Caveats**
+- ship values will not reflect what you see, but will sort in the proper order. fix coming.
 - if output exceeds discord limits, no output will be seen. fix coming.
 - cannot issue `q t'laan` as the ' char is not handled properly. fix coming.
-- officers are stored as lowercase in the database. expect lower case in bot output.
 - the bot cannot handle officer names with spaces. use underscores for now.
 - contact me <@541872005998182423> if you observe bugs or have ideas.
