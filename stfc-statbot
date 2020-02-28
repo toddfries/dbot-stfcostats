@@ -21,6 +21,7 @@ use Bot::Framework;
 use Command::FAQ;
 use Command::debug;
 use Command::i;
+use Command::set;
 use Command::q;
 use Command::Usage;
 use Data::Dumper;
@@ -40,6 +41,7 @@ my $bot = Bot::Framework->new(%{$config});
 Command::FAQ->new('bot' => $bot);
 Command::debug->new('bot' => $bot);
 Command::i->new('bot' => $bot);
+Command::set->new('bot' => $bot);
 Command::q->new('bot' => $bot);
 Command::Usage->new('bot' => $bot);
 
