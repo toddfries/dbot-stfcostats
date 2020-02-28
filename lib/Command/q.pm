@@ -232,15 +232,15 @@ sub _stats_fmt {
 	my ($short, $rank, $level);
 	my $i = 0;
 	my $str = "";
-	$str .= sprintf "`                              Station         Ship`\n";
-	$str .= sprintf "`.   %15s%3s%3s%5s%5s%5s%5s%5s%5s %s`\n",
+	$str .= sprintf "`.                              Station         Ship`\n";
+	$str .= sprintf "`.    %15s%3s%3s%5s%5s%5s%5s%5s%5s %s`\n",
 		"Short","R","L","Att","Def","Hea", "Att", "Def", "Hea", "Strength";
 			
 	my ($attack, $defense, $health, $strength);
 	my ($sattack, $sdefense, $shealth);
 	while (($short, $rank, $level, $attack, $defense, $health, $sattack, $sdefense, $shealth, $strength) = $sth->fetchrow_array) {
 		$i++;
-		$str .= sprintf "`%2d. %15s %2d %2d %4d %4d %4d %4d %4d %4d %5d`\n", 
+		$str .= sprintf "`.%2d. %15s %2d %2d %4d %4d %4d %4d %4d %4d %5d`\n", 
 			$i, $short, $rank, $level,
 			$attack, $defense, $health,
 			$sattack, $sdefense, $shealth,
