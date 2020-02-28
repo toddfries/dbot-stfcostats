@@ -144,39 +144,39 @@ sub query {
 	my $counter = 0;
 	if (($health + $defense + $attack) == 2) {
 		if ($health > 0 && $defense > 0) {
-			$order .= " (s.defense + s.health) ";
+			$order .= " (def_on_ship + hea_on_ship) ";
 			$counter++;
 			$health = 0;
 			$defense = 0;
 		}
 		if ($health > 0 && $attack > 0) {
-			$order .= " (s.attack + s.health) ";
+			$order .= " (att_on_ship + hea_on_ship) ";
 			$counter++;
 			$health = 0;
 			$attack = 0;
 		}
 		if ($defense > 0 && $attack > 0) {
-			$order .= " (s.attack + s.defense) ";
+			$order .= " (att_on_ship + def_on_ship) ";
 			$counter++;
 			$defense = 0;
 			$attack = 0;
 		}
 	} else {
 		if ($health > 0) {
-			$order .= "s.health ";
+			$order .= "hea_on_ship ";
 			$counter++;
 		}
 		if ($defense > 0) {
 			if ($counter++ > 0) {
 				$order .= ",";
 			}
-			$order .= "s.defense ";
+			$order .= "def_on_ship ";
 		}
 		if ($attack > 0) {
 			if ($counter++ > 0) {
 				$order .= ",";
 			}
-			$order .= "s.attack ";
+			$order .= "att_on_ship ";
 		}
 	}
 	if ($strength > 0) {
@@ -210,7 +210,10 @@ sub _stats_fmt {
 	my $db  = $bot->{db};
 
 	my $q = "select o.short, s.rank, s.level, s.attack, s.defense, s.health, ";
-	$q .= "((s.attack + s.defense + s.health) * (s.rank + 1)) as strength ";
+	$q .= "(s.attack*(s.rank+1)) as att_on_ship, ";
+	$q .= "(s.defense*(s.rank+1)) as def_on_ship, ";
+	$q .= "(s.health*(s.rank+1)) as hea_on_ship, ";
+	$q .= "((s.attack+s.defense+s.health)*(rank+1)) as strength ";
 	$q .= "from officers as o, ostats as s ";
 
 	$q .= $qlim;
@@ -228,14 +231,20 @@ sub _stats_fmt {
 
 	my ($short, $rank, $level);
 	my $i = 0;
-	my $str = sprintf "`    %15s%3s%3s%4s%4s%4s %s`\n",
-		"Short","R","L","Att","Def","Hea", "Strength";
+	my $str = "";
+	$str .= sprintf "`                              Station         Ship`\n";
+	$str .= sprintf "`.   %15s%3s%3s%5s%5s%5s%5s%5s%5s %s`\n",
+		"Short","R","L","Att","Def","Hea", "Att", "Def", "Hea", "Strength";
 			
 	my ($attack, $defense, $health, $strength);
-	while (($short, $rank, $level, $attack, $defense, $health, $strength) = $sth->fetchrow_array) {
+	my ($sattack, $sdefense, $shealth);
+	while (($short, $rank, $level, $attack, $defense, $health, $sattack, $sdefense, $shealth, $strength) = $sth->fetchrow_array) {
 		$i++;
-		$str .= sprintf "`%2d. %15s %2d %2d %3d %3d %3d %5d`\n", 
-			$i, $short, $rank, $level, $attack, $defense, $health, $strength;
+		$str .= sprintf "`%2d. %15s %2d %2d %4d %4d %4d %4d %4d %4d %5d`\n", 
+			$i, $short, $rank, $level,
+			$attack, $defense, $health,
+			$sattack, $sdefense, $shealth,
+			$strength;
 	}
 	return $str;
 }
