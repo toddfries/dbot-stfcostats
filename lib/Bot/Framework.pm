@@ -169,10 +169,24 @@ sub init_db
 		print "db: Creating player_stats table\n";
 		my $q = "CREATE TABLE player_stats (";
 		$q .= "id ${serialtype}, ";
+		$q .= "player_id INTEGER, ";
 		$q .= "academy INT, ";
 		$q .= "adv_train INT, ";
 		$q .= "attack_train INT, ";
-		$q .= "defense_train INT ";
+		$q .= "defense_train INT, ";
+		# profile bits
+		$q .= "power INT, ";
+		$q .= "power_destroyed INT, ";
+		$q .= "pship_destroyed INT, ";
+		$q .= "pvp_ratio float, ";
+		$q .= "hostiles_destroyed INT, ";
+		$q .= "pvp_damage INT, ";
+		$q .= "pve_damage INT, ";
+		$q .= "missions_done INT, ";
+		$q .= "rss_mined INT, ";
+		$q .= "help_sent INT, ";
+		$q .= "utime timestamp without time zone DEFAULT now()";
+		$q .= "ctime timestamp without time zone DEFAULT now()";
 		$q .= ") with oids";
 		my $sth => $d->doquery($q);
 	}
