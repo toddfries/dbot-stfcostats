@@ -150,7 +150,7 @@ sub query {
 			$defense = 0;
 		}
 		if ($health > 0 && $attack > 0) {
-			$order .= " (att_on_ship + hea_on_ship) ";
+			$order .= " ((s.attack*(s.rank+1)) + (s.health*(s.rank+1))) ";
 			$counter++;
 			$health = 0;
 			$attack = 0;
@@ -208,6 +208,7 @@ sub _stats_fmt {
 	my ($self, $qlim) = @_;
 	my $bot = $self->{bot};
 	my $db  = $bot->{db};
+	my $str = "";
 
 	my $q = "select o.short, s.rank, s.level, s.attack, s.defense, s.health, ";
 	$q .= "(s.attack*(s.rank+1)) as att_on_ship, ";
@@ -220,9 +221,13 @@ sub _stats_fmt {
 
 	if ($bot->{debug} > 0) {
 		print "q: ${q}\n";
+		$str .= "sql query:${q}\n";
 	}
 
 	my $sth = $db->doquery($q);
+	if (!defined($sth) || $sth == -1) {
+		return "Something went wrong, please contact Spuds\n";
+	}
 	my $rv = $sth->rows;
 
 	if ($rv < 1) {
@@ -231,7 +236,6 @@ sub _stats_fmt {
 
 	my ($short, $rank, $level);
 	my $i = 0;
-	my $str = "";
 	$str .= sprintf "`.                              Station         Ship`\n";
 	$str .= sprintf "`.    %15s%3s%3s%5s%5s%5s%5s%5s%5s %s`\n",
 		"Short","R","L","Att","Def","Hea", "Att", "Def", "Hea", "Strength";
