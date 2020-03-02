@@ -222,8 +222,9 @@ sub init_db
 		print "db: Creating buff_name table\n";
 		my $q = "CREATE TABLE buff_name (";
 		$q .= "id ${serialtype}, ";
-		$q .= "name TEXT, ";
+		$q .= "type_name TEXT, ";
 		$q .= "short_name TEXT, ";
+		$q .= "long_name TEXT, ";
 		$q .= "descr TEXT, ";
 		$q .= "ctime timestamp without time zone DEFAULT now()";
 		$q .= ") with oids";
