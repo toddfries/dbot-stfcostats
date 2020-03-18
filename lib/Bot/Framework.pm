@@ -175,6 +175,7 @@ sub init_db
 		$q .= "adv_train INT, ";
 		$q .= "attack_train INT, ";
 		$q .= "defense_train INT, ";
+		$q .= "prime_officer INT, ";
 		# profile bits
 		$q .= "power INT, ";
 		$q .= "power_destroyed INT, ";
@@ -186,7 +187,7 @@ sub init_db
 		$q .= "missions_done INT, ";
 		$q .= "rss_mined INT, ";
 		$q .= "help_sent INT, ";
-		$q .= "utime timestamp without time zone DEFAULT now()";
+		$q .= "utime timestamp without time zone DEFAULT now(), ";
 		$q .= "ctime timestamp without time zone DEFAULT now()";
 		$q .= ") with oids";
 		my $sth => $d->doquery($q);
