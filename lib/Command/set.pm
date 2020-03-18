@@ -23,8 +23,8 @@ my $function = \&cmd_set;
 my $usage = <<EOF;
 Usage:
  `stats.<var> [<val>]`
-   .. var = [ academy | adv_training | attack_training | defense_training ]
-   .. val = number, it not present, consider it a query to retrieve and display
+   .. var = [ academy | adv_training | attack_training | defense_training | prime_officer ]
+   .. val = number, if not present, consider it a query to retrieve and display
  -or-
  `stats`
    .. 
@@ -108,7 +108,7 @@ sub cmd_set
 sub getall {
 	my ($self, $id) = @_;
 	my $info = "";
-	foreach my $v (('academy', 'adv_train', 'attack_train', 'defense_train')) {
+	foreach my $v (('academy', 'adv_train', 'attack_train', 'defense_train', 'prime_officer')) {
 		$info .= $self->get($id, $v)."\n";
 	}
 	return $info;
