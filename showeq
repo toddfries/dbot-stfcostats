@@ -18,14 +18,7 @@ use strict;
 use warnings;
 
 use Bot::Framework;
-use Command::FAQ;
-use Command::debug;
-use Command::i;
-use Command::new;
-use Command::set;
-use Command::q;
 use Command::eq;
-use Command::Usage;
 use Data::Dumper;
 use Getopt::Std;
 use ReadConf;
@@ -33,29 +26,18 @@ use ReadConf;
 our $opt_c = $ENV{'HOME'}."/.dbot-stfcostats.conf";
 our $opt_n;
 
-getopt('c:n');
+getopt('n');
 
-my $r = ReadConf->new();
-my $config = $r->readconf($opt_c);
-
-my $bot = Bot::Framework->new(%{$config});
-
-Command::FAQ->new('bot' => $bot);
-Command::debug->new('bot' => $bot);
-Command::eq->new('bot' => $bot);
-Command::i->new('bot' => $bot);
-Command::new->new('bot' => $bot);
-Command::set->new('bot' => $bot);
-Command::q->new('bot' => $bot);
-Command::Usage->new('bot' => $bot);
+my $eq = Command::eq->new();
 
 if (defined($opt_n)) {
 	print "Parsing bits tested ok, exiting\n";
 	exit(0);
 }
 
-print "Starting Bot\n";
+if (!defined($ARGV[2])) {
+	print "Usage: showeq <lat> <lon> <state>\n";
+	exit(1);
+}
 
-$bot->start();
-
-print "Ending Bot\n";
+print $eq->show_eq(-1, "eq", $ARGV[0], $ARGV[1], $ARGV[2]);
